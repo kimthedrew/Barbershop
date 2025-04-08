@@ -5,18 +5,22 @@
 # Remote library imports
 from flask import request
 from flask_restful import Resource
+from resources import ClientList, BarberList, ServiceList, ReviewList, AppointmentList, AppointmentDetail
+from config import app, db, api
 
 # Local imports
 from config import app, db, api
-# Add your model imports
 from models import Client, Barber, Service, Appointment, Review
 
 
-# Views go here!
+# Routes
+api.add_resource(ClientList, "/clients")
+api.add_resource(BarberList, "/barbers")
+api.add_resource(ServiceList, "/services")
+api.add_resource(ReviewList, "/reviews")
+api.add_resource(AppointmentList, "/appointments")
+api.add_resource(AppointmentDetail, "/appointments/<int:id>")
 
-@app.route('/')
-def index():
-    return '<h1>Project Server</h1>'
 
 
 if __name__ == '__main__':

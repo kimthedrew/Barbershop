@@ -1,14 +1,12 @@
 from sqlalchemy_serializer import SerializerMixin
-from sqlalchemy.ext.associationproxy import association_proxy
 from datetime import datetime
 
 from config import db
 
 
-# Models go here!
 class Client(db.Model, SerializerMixin):
     __tablename__ = 'clients'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -17,7 +15,7 @@ class Client(db.Model, SerializerMixin):
     appointments = db.relationship('Appointment', backref='client', lazy=True)
     reviews = db.relationship('Review', backref='client', lazy=True)
 
-    serialize_rules = ('-appointments.client', '-reviews.client')  # prevent nesting loops
+    serialize_rules = ('-appointments.client', '-reviews.client')
 
 class Barber(db.Model, SerializerMixin):
     __tablename__ = 'barbers'
@@ -54,7 +52,13 @@ class Appointment(db.Model, SerializerMixin):
     date_time = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default="Scheduled")
 
-    serialize_rules = ('-client.appointments', '-barber.appointments', '-service.appointments')
+    serialize_rules = (
+        '-client.appointments',
+        '-barber.appointments',
+        '-service.appointments',
+        '-client.reviews',  # Optional extra exclusion
+        '-barber.reviews',  # Optional extra exclusion
+    )
 
 class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
@@ -68,4 +72,4 @@ class Review(db.Model, SerializerMixin):
     comment = db.Column(db.Text)
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
-    serialize_rules = ('-client.reviews', '-barber.reviews')
+    serialize_rules = ('-client.reviews', '-barber.reviews', '-appointment.reviews')
