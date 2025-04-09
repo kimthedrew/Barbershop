@@ -11,6 +11,8 @@ class Client(db.Model, SerializerMixin):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     phone = db.Column(db.String(20), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    username = db.Column(db.String(80), nullable=False)
 
     appointments = db.relationship('Appointment', backref='client', lazy=True)
     reviews = db.relationship('Review', backref='client', lazy=True)

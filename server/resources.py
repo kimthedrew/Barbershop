@@ -1,6 +1,7 @@
 from flask import request
 from flask_restful import Resource
 from datetime import datetime
+from flask_jwt_extended import jwt_required
 
 from config import db
 from models import Client, Barber, Service, Appointment, Review
@@ -102,8 +103,10 @@ class ReviewList(Resource):
 
 # -------- Appointments (Full CRUD) --------
 class AppointmentList(Resource):
+    @jwt_required
     def get(self):
         return [appt.to_dict() for appt in Appointment.query.all()], 200
+    
 
     def post(self):
         data = request.get_json()

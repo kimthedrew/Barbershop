@@ -7,11 +7,14 @@ from flask import request
 from flask_restful import Resource
 from resources import ClientList, BarberList, ServiceList, ReviewList, AppointmentList, AppointmentDetail
 from config import app, db, api
+from auth import *
+from flask_migrate import Migrate
 
 # Local imports
 from config import app, db, api
 from models import Client, Barber, Service, Appointment, Review
 
+migrate = Migrate(app, db)
 
 # Routes
 api.add_resource(ClientList, "/clients")
