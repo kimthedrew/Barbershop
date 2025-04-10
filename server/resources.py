@@ -136,7 +136,7 @@ class AppointmentDetail(Resource):
         return appt.to_dict(), 200
 
     def patch(self, id):
-        appt = Appointment.query.get(id)
+        appt = Appointment.query.get(id)                                                                                                                                                                                                                
         if not appt:
             return {"error": "Appointment not found"}, 404
 
