@@ -1,8 +1,8 @@
-"""defined models with their relationships
+"""created models
 
-Revision ID: 94d2106aef8f
+Revision ID: 2396512db91a
 Revises: 
-Create Date: 2025-04-08 09:27:01.518766
+Create Date: 2025-04-11 08:05:54.331993
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '94d2106aef8f'
+revision = '2396512db91a'
 down_revision = None
 branch_labels = None
 depends_on = None
