@@ -60,8 +60,8 @@ class Appointment(db.Model, SerializerMixin):
         '-client.appointments',
         '-barber.appointments',
         '-service.appointments',
-        '-client.reviews',  # Optional extra exclusion
-        '-barber.reviews',  # Optional extra exclusion
+        '-client.reviews',  
+        '-barber.reviews', 
     )
 
 class Review(db.Model, SerializerMixin):
