@@ -39,10 +39,8 @@ export const Home = () => {
       if (!response.ok) throw new Error('Failed to book appointment');
 
       setShowAppointmentForm(false);
-      // You might want to show a success message here
     } catch (error) {
       console.error('Error booking appointment:', error);
-      // Handle error (show error message)
     }
   };
 
@@ -56,11 +54,20 @@ export const Home = () => {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900">Expert Barbers</h1>
-        <p className="mt-2 text-lg text-gray-600">Book your next haircut with our professional team</p>
+      {/* Hero Section with Background Image */}
+      <div className="relative h-[300px] mb-10">
+        <img
+          src="https://images.unsplash.com/photo-1503951914436-6850fa2e2c0b?auto=format&fit=crop&q=80&w=2000"
+          alt="Barbershop"
+          className="w-full h-full object-cover opacity-30"
+        />
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4">
+          <h1 className="text-5xl font-bold text-gray-900 z-10">Expert Barbers</h1>
+          <p className="mt-2 text-xl text-gray-700 z-10">Book your next haircut with our professional team</p>
+        </div>
       </div>
 
+      {/* Barber List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {barbers.map(barber => (
           <BarberCard
@@ -71,6 +78,7 @@ export const Home = () => {
         ))}
       </div>
 
+      {/* Appointment Form */}
       {showAppointmentForm && selectedBarberId && (
         <AppointmentForm
           barberId={selectedBarberId}
