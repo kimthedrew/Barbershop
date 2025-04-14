@@ -57,7 +57,7 @@ export const Home = () => {
       {/* Hero Section with Background Image */}
       <div className="relative h-[300px] mb-10">
         <img
-          src="https://images.unsplash.com/photo-1503951914436-6850fa2e2c0b?auto=format&fit=crop&q=80&w=2000"
+          src="/src/images/Untitled design.png"
           alt="Barbershop"
           className="w-full h-full object-cover opacity-30"
         />

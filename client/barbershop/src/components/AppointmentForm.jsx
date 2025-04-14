@@ -12,7 +12,7 @@ export const AppointmentForm = ({ barberId, onSubmit, onClose }) => {
 
   useEffect(() => {
     // Fetch services
-    fetch('/api/services')
+    fetch('/http://127.0.0.1:5555/services')
       .then(res => res.json())
       .then(data => setServices(data))
       .catch(error => console.error('Error fetching services:', error));

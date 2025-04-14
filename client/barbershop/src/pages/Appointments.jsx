@@ -26,7 +26,7 @@ export const Appointments = () => {
     if (!selectedAppointment) return;
 
     try {
-      const response = await fetch('/api/reviews', {
+      const response = await fetch('/http://127.0.0.1:5555/reviews', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
