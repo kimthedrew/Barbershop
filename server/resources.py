@@ -14,6 +14,12 @@ class ClientList(Resource):
 
     def post(self):
         data = request.get_json()
+        if Client.query.filter_by(email=data["email"]).first():
+            return {"error": "Email already exists."}, 400
+        if Client.query.filter_by(phone=data["phone"]).first():
+            return {"error": "Phone number already exists."}, 400
+        if not isinstance(data["phone"], str) or len(data["phone"]) < 10:
+            return {"error": "Invalid phone number."}, 400
         if not data:
             return {"error": "Invalid input"}, 400
 
@@ -60,6 +66,12 @@ class ServiceList(Resource):
 
     def post(self):
         data = request.get_json()
+        if Service.query.filter_by(name=data["name"]).first():
+            return {"error": "Service already exists."}, 400
+        if not isinstance(data["price"], (int, float)) or data["price"] <= 0:
+            return {"error": "Invalid price."}, 400
+        if not isinstance(data["name"], str) or len(data["name"]) < 3:
+            return {"error": "Invalid service name."}, 400
         if not data:
             return {"error": "Invalid input"}, 400
 
@@ -79,27 +91,44 @@ class ServiceList(Resource):
 # -------- Reviews --------
 class ReviewList(Resource):
     def get(self):
-        return [review.to_dict() for review in Review.query.all()], 200
+        try:
+            reviews = Review.query.all()
+            return [review.to_dict() for review in reviews], 200
+        except Exception as e:
+            return {"error": f"Failed to fetch reviews: {str(e)}"}, 500
 
     def post(self):
         data = request.get_json()
+
         if not data:
-            return {"error": "Invalid input"}, 400
+            return {"error": "No input provided"}, 400
+
+        required_fields = ["client_id", "barber_id", "appointment_id", "rating"]
+
+        for field in required_fields:
+            if field not in data:
+                return {"error": f"Missing required field: {field}"}, 400
 
         try:
-            review = Review(
+            # Create new review
+            new_review = Review(
                 client_id=data["client_id"],
                 barber_id=data["barber_id"],
                 appointment_id=data["appointment_id"],
                 rating=data["rating"],
                 comment=data.get("comment", "")
             )
-            db.session.add(review)
-            db.session.commit()
-            return review.to_dict(), 201
-        except Exception as e:
-            return {"error": str(e)}, 400
 
+            # Add and commit
+            db.session.add(new_review)
+            db.session.commit()
+
+            # After commit, make sure to return the review data
+            return new_review.to_dict(), 201
+
+        except Exception as e:
+            db.session.rollback()  # Rollback in case of error
+            return {"error": f"Failed to create review: {str(e)}"}, 400
 
 # -------- Appointments (Full CRUD) --------
 class AppointmentList(Resource):
