@@ -35,7 +35,9 @@ with app.app_context():
        barber = Barber(
            name=fake.name(),
            specialty=random.choice(["Fade", "Beard Trim", "Braids", "Color", "Dreadlocks"]),
-           phone=fake.phone_number()  
+           phone=fake.phone_number(),
+           email=fake.unique.email(),
+           password="password123"  
         )
        barbers.append(barber)
     db.session.add_all(barbers)
@@ -43,12 +45,15 @@ with app.app_context():
     # Clients
     clients = []
     for _ in range(10):
-        client = Client(
-            name=fake.name(),
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        clients.append(Client(
+            name=f"{first_name} {last_name}",
             email=fake.unique.email(),
-            phone=fake.phone_number()
-        )
-        clients.append(client)
+            phone=fake.phone_number(),
+            password="client123",
+            username=f"{first_name.lower()}{random.randint(100,999)}"
+        ))
     db.session.add_all(clients)
 
     # Services
