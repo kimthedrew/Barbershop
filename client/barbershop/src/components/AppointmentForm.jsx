@@ -1,97 +1,138 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { format } from 'date-fns';
+import PropTypes from 'prop-types';
 
-export default function AppointmentForm() {
-  const [form, setForm] = useState({
-    client_id: "",
-    barber_id: "",
-    service_id: "",
-    date_time: "",
-  });
-  const [barbers, setBarbers] = useState([]);
+export const AppointmentForm = ({ barberId, onSubmit, onClose }) => {
   const [services, setServices] = useState([]);
+  const [barbers, setBarbers] = useState([]);
+  const [selectedService, setSelectedService] = useState('');
+  const [selectedBarber, setSelectedBarber] = useState(barberId || '');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
 
   useEffect(() => {
-    fetch("http://localhost:5555/barbers")
-      .then((r) => r.json())
-      .then(setBarbers);
+    // Fetch services
+    fetch('/api/services')
+      .then(res => res.json())
+      .then(data => setServices(data))
+      .catch(error => console.error('Error fetching services:', error));
 
-    fetch("http://localhost:5555/services")
-      .then((r) => r.json())
-      .then(setServices);
-  }, []);
+    // Fetch barbers if barberId is not provided
+    if (!barberId) {
+      fetch('/api/barbers')
+        .then(res => res.json())
+        .then(data => setBarbers(data))
+        .catch(error => console.error('Error fetching barbers:', error));
+    }
+  }, [barberId]);
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
-
-  function handleSubmit(e) {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    onSubmit({
+      barberId: selectedBarber,
+      serviceId: selectedService,
+      date: selectedDate,
+      time: selectedTime,
+    });
+  };
 
-    fetch("http://localhost:5555/appointments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        alert("Appointment booked!");
-        console.log(data);
-      })
-      .catch((err) => console.error("Booking failed", err));
-  }
+  const today = format(new Date(), 'yyyy-MM-dd');
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10 p-6 shadow-md">
-      <h2 className="text-xl font-bold mb-4">Book Appointment</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6">Book Appointment</h2>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {!barberId && (
+            <div>
+              <label className="block text-gray-700 mb-2">Select Barber</label>
+              <select
+                value={selectedBarber}
+                onChange={(e) => setSelectedBarber(e.target.value)}
+                className="w-full p-2 border rounded-md"
+                required
+              >
+                <option value="">Choose a barber</option>
+                {barbers.map(barber => (
+                  <option key={barber.id} value={barber.id}>
+                    {barber.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-      <input
-        type="text"
-        name="client_id"
-        placeholder="Client ID"
-        value={form.client_id}
-        onChange={handleChange}
-        className="input w-full mb-3"
-      />
+          <div>
+            <label className="block text-gray-700 mb-2">Select Service</label>
+            <select
+              value={selectedService}
+              onChange={(e) => setSelectedService(e.target.value)}
+              className="w-full p-2 border rounded-md"
+              required
+            >
+              <option value="">Choose a service</option>
+              {services.map(service => (
+                <option key={service.id} value={service.id}>
+                  {service.name} - ${service.price}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      <select
-        name="barber_id"
-        value={form.barber_id}
-        onChange={handleChange}
-        className="input w-full mb-3"
-      >
-        <option value="">Select Barber</option>
-        {barbers.map((barber) => (
-          <option key={barber.id} value={barber.id}>
-            {barber.name}
-          </option>
-        ))}
-      </select>
+          <div>
+            <label className="block text-gray-700 mb-2">Select Date</label>
+            <input
+              type="date"
+              min={today}
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="w-full p-2 border rounded-md"
+              required
+            />
+          </div>
 
-      <select
-        name="service_id"
-        value={form.service_id}
-        onChange={handleChange}
-        className="input w-full mb-3"
-      >
-        <option value="">Select Service</option>
-        {services.map((service) => (
-          <option key={service.id} value={service.id}>
-            {service.name}
-          </option>
-        ))}
-      </select>
+          <div>
+            <label className="block text-gray-700 mb-2">Select Time</label>
+            <select
+              value={selectedTime}
+              onChange={(e) => setSelectedTime(e.target.value)}
+              className="w-full p-2 border rounded-md"
+              required
+            >
+              <option value="">Choose a time</option>
+              {Array.from({ length: 8 }, (_, i) => i + 9).map(hour => (
+                <React.Fragment key={hour}>
+                  <option value={`${hour}:00`}>{`${hour}:00 ${hour < 12 ? 'AM' : 'PM'}`}</option>
+                  <option value={`${hour}:30`}>{`${hour}:30 ${hour < 12 ? 'AM' : 'PM'}`}</option>
+                </React.Fragment>
+              ))}
+            </select>
+          </div>
 
-      <input
-        type="datetime-local"
-        name="date_time"
-        value={form.date_time}
-        onChange={handleChange}
-        className="input w-full mb-3"
-      />
-
-      <button className="btn w-full">Book</button>
-    </form>
+          <div className="flex justify-end space-x-4 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Book Appointment
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
-}
+};
+
+AppointmentForm.propTypes = {
+  barberId: PropTypes.string,
+  onSubmit: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
